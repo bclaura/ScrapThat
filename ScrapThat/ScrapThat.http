@@ -1,0 +1,6 @@
+@ScrapThat_HostAddress = http://localhost:5252
+
+GET {{ScrapThat_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
