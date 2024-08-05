@@ -1,6 +1,6 @@
-https://www.emag.ro/laptopuri/c
-https://www.emag.ro/telefoane-mobile/c
-https://www.emag.ro/tablete/c
-https://www.emag.ro/smartwatch/c
-https://www.emag.ro/bratari-fitness/c
-https://www.emag.ro/casti-bluetooth-telefoane/c
+https://www.emag.ro/laptopuri
+https://www.emag.ro/telefoane-mobile
+https://www.emag.ro/tablete
+https://www.emag.ro/smartwatch
+https://www.emag.ro/bratari-fitness
+https://www.emag.ro/casti-bluetooth-telefoane
