@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Web;
 using System.Text.RegularExpressions;
+using Polly.Retry;
+using Polly;
+using System.Net;
+
 
 namespace ScrapThat.Services
 {
@@ -38,26 +42,89 @@ namespace ScrapThat.Services
                         links = $"{url}/c";
                     }
 
-                    var headResponse = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, links));
-                    var finalUrl = headResponse.RequestMessage.RequestUri.ToString();
+                    var request = new HttpRequestMessage(HttpMethod.Get, links);
+                    HttpResponseMessage response = null;
 
-                    if (!finalUrl.Equals(links, StringComparison.OrdinalIgnoreCase))
+                    try
                     {
-                        break;
+                        response = await _httpClient.SendAsync(request);
+                    }
+                    catch (Exception ex) 
+                    {
+                        Console.WriteLine($"An error occured while sending the request: {ex.Message}");
+                        throw;
                     }
 
-                    var web = new HtmlWeb();
-                    var doc = await web.LoadFromWebAsync(links);
-                    var products = doc.DocumentNode.SelectNodes("//div[@class='card-item card-standard js-product-data js-card-clickable ']");
-                    
-                    if(products == null || products.Count == 0)
+
+                    if(response.StatusCode == HttpStatusCode.NetworkAuthenticationRequired)
                     {
-                        hasNextPage = false;
-                        break;
+                        Console.WriteLine("Captcha detected. Please solve it in the browser to continue");
+
+                        Console.Beep();
+
+                        bool captchaSolved = false;
+                        int maxRetry = 500;
+                        int retryInterval = 5;
+
+                        for(int i = 0; i < maxRetry; i += retryInterval)
+                        {
+                            Console.WriteLine("Waiting for Captcha to be solved....");
+                            await Task.Delay(retryInterval * 1000);
+
+                            request.Dispose();
+
+                            request = new HttpRequestMessage(HttpMethod.Get, links);
+
+                            response = await _httpClient.SendAsync(request);
+
+                            if(response.IsSuccessStatusCode)
+                            {
+                                captchaSolved = true;
+                                Console.WriteLine("Captcha solved, resuming scraping");
+                                break;
+                            }
+                        }
+
+                        if(!captchaSolved)
+                        {
+                            Console.WriteLine("Captcha was not solved in 5 minutes. Stopping...");
+                            break;
+                        }
                     }
 
-                    await ScrapeWebsiteAsync(links);
-                    pageNumber++;
+
+                    if(response.IsSuccessStatusCode)
+                    {
+                        var headRequest = new HttpRequestMessage(HttpMethod.Head, links);
+
+                        var headResponse = await _httpClient.SendAsync(headRequest);
+
+                        var finalUrl = headResponse.RequestMessage.RequestUri.ToString();
+
+                        if (!finalUrl.Equals(links, StringComparison.OrdinalIgnoreCase))
+                        {
+                            break;
+                        }
+
+                        var web = new HtmlWeb();
+                        var doc = await web.LoadFromWebAsync(links);
+                        var products = doc.DocumentNode.SelectNodes("//div[@class='card-item card-standard js-product-data js-card-clickable ']");
+
+                        if (products == null || products.Count == 0)
+                        {
+                            hasNextPage = false;
+                            break;
+                        }
+
+                        await ScrapeWebsiteAsync(links);
+
+                        pageNumber++;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to retrieve page {pageNumber}. Status code: {response.StatusCode}");
+                        break;
+                    }
                 }
             }
         }
