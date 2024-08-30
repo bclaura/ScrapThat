@@ -12,8 +12,8 @@ using ScrapThat.Data;
 namespace ScrapThat.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240716113807_DbChange")]
-    partial class DbChange
+    [Migration("20240830072927_PropertiesAdded")]
+    partial class PropertiesAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,10 @@ namespace ScrapThat.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -45,6 +49,16 @@ namespace ScrapThat.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WebsiteUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -70,27 +84,13 @@ namespace ScrapThat.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<string>("WebsiteUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("ProductPriceHistories");
-                });
-
-            modelBuilder.Entity("ScrapThat.Models.ProductPriceHistory", b =>
-                {
-                    b.HasOne("ScrapThat.Models.Product", "Product")
-                        .WithMany("PriceHistories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("ScrapThat.Models.Product", b =>
-                {
-                    b.Navigation("PriceHistories");
                 });
 #pragma warning restore 612, 618
         }

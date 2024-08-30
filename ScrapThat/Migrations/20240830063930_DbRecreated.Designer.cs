@@ -12,8 +12,8 @@ using ScrapThat.Data;
 namespace ScrapThat.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240716112957_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240830063930_DbRecreated")]
+    partial class DbRecreated
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,12 @@ namespace ScrapThat.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Products");
@@ -72,25 +78,7 @@ namespace ScrapThat.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
-
                     b.ToTable("ProductPriceHistories");
-                });
-
-            modelBuilder.Entity("ScrapThat.Models.ProductPriceHistory", b =>
-                {
-                    b.HasOne("ScrapThat.Models.Product", "Product")
-                        .WithMany("PriceHistories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("ScrapThat.Models.Product", b =>
-                {
-                    b.Navigation("PriceHistories");
                 });
 #pragma warning restore 612, 618
         }

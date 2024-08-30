@@ -14,10 +14,12 @@ namespace ScrapThat.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>()
-                .HasMany(p => p.PriceHistories)
-                .WithOne(ph => ph.Product)
-                .HasForeignKey(p => p.ProductId);
+            modelBuilder.Entity<ProductPriceHistory>()
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<ProductPriceHistory>()
+                .Property(p => p.ProductId)
+                .IsRequired();
 
             base.OnModelCreating(modelBuilder);
         }
