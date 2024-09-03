@@ -14,25 +14,6 @@ namespace ScrapThat.Controllers
             _scraperService = scraperService;
         }
 
-        /*[HttpPost("scrape")]
-        public async Task<IActionResult> Scrape([FromBody] string url)
-        {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var validatedUri))
-            {
-                return BadRequest("Invalid Url format");
-            }
-
-            try
-            {
-                await _scraperService.ScrapeWebsiteAsync(url);
-                return Ok("Scraping initiated");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }*/
-
         [HttpPost("scrape-all")]
         public async Task<IActionResult> ScrapeAll()
         {
