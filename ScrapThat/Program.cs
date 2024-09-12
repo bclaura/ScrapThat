@@ -1,6 +1,7 @@
 using ScrapThat.Data;
 using ScrapThat.Services;
 using Microsoft.EntityFrameworkCore;
+using NSwag.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,20 +24,26 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Swagger configuration
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ScrapThat API V1");
+        c.DefaultModelsExpandDepth(-1); // Optional: To hide schema models
+        c.ConfigObject.AdditionalItems["syntaxHighlight"] = new { activated = false }; // Disable syntax highlighting
+    });
 }
-
-app.UseCors(options =>
-{
-    options.AllowAnyHeader();
-    options.AllowAnyMethod();
-    options.AllowAnyOrigin();
-});
 
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseCors(options =>
+
+    options.AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowAnyOrigin()
+);
 
 app.UseAuthorization();
 
