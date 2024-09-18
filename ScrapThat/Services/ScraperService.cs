@@ -56,7 +56,7 @@ namespace ScrapThat.Services
                     }
 
 
-                    if (response.StatusCode == HttpStatusCode.NetworkAuthenticationRequired)
+                    if (response.StatusCode != HttpStatusCode.OK)
                     {
                         Console.WriteLine("Captcha detected. Please solve it in the browser to continue");
 
@@ -242,6 +242,29 @@ namespace ScrapThat.Services
                                 
                             };
                             _context.Products.Add(existingProduct);
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            bool isUpdated = false;
+
+                            if(existingProduct.Price != price)
+                            {
+                                existingProduct.Price = price;
+                                isUpdated = true;
+                            }
+                            if(existingProduct.Image != image)
+                            {
+                                existingProduct.Image = image;
+                                isUpdated = true;
+                            }
+
+                            existingProduct.DateChecked = DateTime.Today.Date;
+
+                            if(isUpdated)
+                            {
+                                _context.Products.Update(existingProduct);
+                            }
                             await _context.SaveChangesAsync();
                         }
 

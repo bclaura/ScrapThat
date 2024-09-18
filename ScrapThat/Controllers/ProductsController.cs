@@ -95,6 +95,28 @@ namespace ScrapThat.Controllers
             return Ok(products);
         }
 
+        [HttpGet("games")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetGames()
+        {
+            var products = await _context.Products.Where(x => x.CategoryName == "Jocuri Consola &amp; PC").ToListAsync();
+            if (products == null || products.Count == 0)
+            {
+                return NoContent();
+            }
+            return Ok(products);
+        }
+
+        [HttpGet("manga")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetManga()
+        {
+            var products = await _context.Products.Where(x => x.CategoryName == "Benzi desenate").ToListAsync();
+            if (products == null || products.Count == 0)
+            {
+                return NoContent();
+            }
+            return Ok(products);
+        }
+
         [HttpGet("pricehistory/{productId}")]
         public async Task<ActionResult<IEnumerable<ProductPriceHistory>>> GetPriceHistory(int productId)
         {
@@ -118,6 +140,19 @@ namespace ScrapThat.Controllers
                 return NoContent(); 
             }
             return Ok(product);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string query, int page = 1, int pageSize = 60)
+        {
+            var products = await _context.Products.Where(p => p.Name.Contains(query))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var totalCount = await _context.Products.CountAsync(p => p.Name.Contains(query));
+
+            return Ok(new {products, totalCount});
         }
 
     }
