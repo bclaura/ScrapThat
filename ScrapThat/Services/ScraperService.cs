@@ -154,6 +154,26 @@ namespace ScrapThat.Services
                         var image = string.Empty;
                         var websiteUrl = product.GetAttributeValue("data-url", string.Empty);
                         var categoryName = product.GetAttributeValue("data-category-name", string.Empty);
+                        var platform = "";
+                        if(categoryName == "Jocuri Consola &amp; PC")
+                        {
+                            if(url.Contains("platforma-f7609,playstation"))
+                            {
+                                platform = "PlayStation";
+                            }
+                            else if(url.Contains("platforma-f7609,xbox"))
+                            {
+                                platform = "Xbox";
+                            }
+                            else if(url.Contains("platforma-f7609,nintendo"))
+                            {
+                                platform = "Nintendo";
+                            }
+                            else if(url.Contains("platforma-f7609,pc"))
+                            {
+                                platform = "PC";
+                            }
+                        }
 
                         var titleNode = product.SelectSingleNode(".//h2[@class='card-v2-title-wrapper']//a");
                         var titleText = titleNode?.InnerText.Trim();
@@ -238,7 +258,8 @@ namespace ScrapThat.Services
                                 Image = image,
                                 DateChecked = DateTime.Today.Date,
                                 WebsiteUrl = websiteUrl,
-                                CategoryName = categoryName
+                                CategoryName = categoryName,
+                                Platform = platform
                                 
                             };
                             _context.Products.Add(existingProduct);
@@ -258,6 +279,8 @@ namespace ScrapThat.Services
                                 existingProduct.Image = image;
                                 isUpdated = true;
                             }
+                            //temporary to update rest products DELETE AFTER
+                            existingProduct.Platform = platform;
 
                             existingProduct.DateChecked = DateTime.Today.Date;
 

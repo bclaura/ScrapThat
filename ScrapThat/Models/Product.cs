@@ -14,7 +14,7 @@ namespace ScrapThat.Models
         public DateTime DateChecked { get; set; }
         public string WebsiteUrl { get; set; }
         public string CategoryName { get; set; }
-
+        public string Platform { get; set; }
 
     }
 }
